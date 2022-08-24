@@ -17,10 +17,11 @@ class Users(Resource):
     def post(self):
         parser = reqparse.RequestParser()  # init
 
-        parser.add_argument('userId', required=True)
-        parser.add_argument('lname', required=True)
-        parser.add_argument('fname', required=True)
-        parser.add_argument('title', required=True)
+        parser.add_argument('userId', required=True, location='args')
+        parser.add_argument('lname', required=True, location='args')
+        parser.add_argument('fname', required=True, location='args')
+        parser.add_argument('title', required=True, location='args')
+        parser.add_argument('location', required=False, location='args')
 
         args = parser.parse_args()
 
@@ -28,9 +29,10 @@ class Users(Resource):
             'userId': args['userId'],
             'lname': args['lname'],
             'fname': args['fname'],
-            'title': args['title']
+            'title': args['title'],
+            'location': args['location']
 
-        })
+        }, index=[0])
         data = pd.read_csv('users.csv')
 
         if args['userId'] in list(data['userId']):
@@ -43,8 +45,9 @@ class Users(Resource):
                 'userId': args['userId'],
                 'lname': args['lname'],
                 'fname': args['fname'],
-                'title': args['title']
-            })
+                'title': args['title'],
+                'location': args['location']
+            }, index=[0])
             # add the newly provided values
             data = data.append(new_data, ignore_index=True)
             data.to_csv('users.csv', index=False)  # save back to CSV
@@ -88,7 +91,7 @@ class Users(Resource):
 
     def delete(self):
         parser = reqparse.RequestParser()  # initialize
-        parser.add_argument('userId', required=True)  # add userId arg
+        parser.add_argument('userId', required=True, location='args')  # add userId arg
         args = parser.parse_args()  # parse arguments to dictionary
 
         # read our CSV
